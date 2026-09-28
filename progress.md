@@ -37,3 +37,8 @@
 - User could not find Hide and requested a fix plus a dev-mode restart. Reused the approved menu visibility design; promoted the toggle instead of adding new commands.
 - Dashboard now receives a complete native ActionPanel with Hide/Show as its direct first action, exposing it in the footer. Added Cmd+Shift+M; Cmd+R still refreshes usage. Hide is the first menu-bar dropdown item.
 - All 26 tests, TypeScript, ESLint, Prettier, and dev compilation pass. Stopped the previous development watcher and started a fresh terminal-backed watcher (session 15913). Verified registered bundles contain the new action order and shortcut. Native appearance still requires user retest.
+
+### Persistent local use
+- User asked to use the extension permanently without dev mode. Stopped watcher session 15913 with Ctrl+C and ran the optimized `npm run build` successfully.
+- Verified both built commands, manifest, and assets remain registered in ~/.config/raycast/extensions/ai-usage, and cli.pid/dev.log are absent. No watcher is required for subsequent local use.
+- This remains an imported local extension; it is not a Store installation and does not receive automatic Store updates. Official Raycast Create Your First Extension documentation explicitly states the extension stays available after stopping npm run dev.
