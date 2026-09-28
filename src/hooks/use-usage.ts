@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  environment,
   getPreferenceValues,
   LocalStorage,
   showToast,
@@ -11,6 +12,10 @@ import { readCodex } from "../providers/codex";
 import { readClaude } from "../providers/claude";
 import { geminiUnavailable } from "../providers/gemini";
 import type { CodexCache, Preferences, Usage } from "../lib/types";
+
+import { recordQuota } from "../lib/quota-history";
+import type { QuotaObservation } from "../lib/forecast";
+import { join } from "node:path";
 
 import { providerVisible } from "../lib/menu-personalization";
 
@@ -41,6 +46,10 @@ export function useUsage(initial?: Usage) {
       (usage) => (usage.provider === initial?.provider ? initial : usage),
     ),
   );
+  const [history, setHistory] = useState<Record<string, QuotaObservation[]>>(
+    {},
+  );
+  const [historyError, setHistoryError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const active = useRef(false);
   const alive = useRef(true);
@@ -49,6 +58,33 @@ export function useUsage(initial?: Usage) {
       if (active.current) return;
       active.current = true;
       setLoading(true);
+      if (alive.current) {
+        setHistory({});
+        setHistoryError(null);
+      }
+      const capture = async (identity: string, usage: Usage) => {
+        try {
+          const points = await recordQuota(
+            join(environment.supportPath, "analytics"),
+            identity,
+            usage,
+          );
+          if (
+            alive.current &&
+            usage.connectionStatus === "ready" &&
+            usage.freshness === "fresh"
+          )
+            setHistory((previous) => ({
+              ...previous,
+              [usage.provider]: points,
+            }));
+        } catch {
+          if (alive.current)
+            setHistoryError(
+              "Quota history could not be saved. Forecasts may be unavailable.",
+            );
+        }
+      };
       const update = (usage: Usage) => {
         if (alive.current)
           setUsages((previous) =>
@@ -69,6 +105,11 @@ export function useUsage(initial?: Usage) {
               );
               update(result.usage);
               if (result.cache)
+                await capture(
+                  `codex:${result.cache.fingerprint}`,
+                  result.usage,
+                );
+              if (result.cache)
                 await LocalStorage.setItem(key, JSON.stringify(result.cache));
               else await LocalStorage.removeItem(key);
             } catch (error) {
@@ -76,13 +117,17 @@ export function useUsage(initial?: Usage) {
               await LocalStorage.removeItem(key);
             }
           })(),
-          (async () =>
-            providerVisible("claude", preferences) &&
-            update(
-              await isolatedRead("claude", () =>
-                readClaude(preferences.claudeSnapshot),
-              ),
-            ))(),
+          (async () => {
+            if (!providerVisible("claude", preferences)) return;
+            const usage = await isolatedRead("claude", () =>
+              readClaude(preferences.claudeSnapshot),
+            );
+            update(usage);
+            await capture(
+              `claude-snapshot:${preferences.claudeSnapshot || "default"}`,
+              usage,
+            );
+          })(),
         ]);
         if (force && alive.current)
           await showToast({
@@ -121,5 +166,7 @@ export function useUsage(initial?: Usage) {
     ),
     loading,
     refresh,
+    history,
+    historyError,
   };
 }

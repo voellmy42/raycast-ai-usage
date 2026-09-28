@@ -19,7 +19,7 @@ import {
 } from "./lib/format";
 
 export default function ShowAIUsage() {
-  const { usages, loading, refresh } = useUsage();
+  const { usages, loading, refresh, history } = useUsage();
   const visibility = useMenuVisibility();
   const [, tick] = useState(0);
   useEffect(() => {
@@ -83,7 +83,13 @@ export default function ShowAIUsage() {
                     },
                     ...(stale ? [{ tag: "Stale" }] : []),
                   ]}
-                  detail={<QuotaDetail usage={usage} window={window} />}
+                  detail={
+                    <QuotaDetail
+                      usage={usage}
+                      window={window}
+                      observations={history[usage.provider] ?? []}
+                    />
+                  }
                   actions={
                     <UsageActions
                       usage={usage}

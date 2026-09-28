@@ -11,3 +11,5 @@ Bound process output and per-request timeouts. Ignore notifications and reject u
 Verified with bundled CLI 0.158.0-alpha.2.1. The global npm launcher fails with ENOENT. Sandboxed CLI startup failed because the provider runtime needs its normal account-storage permissions; the same read-only handshake succeeds with host execution permissions. Protocol output may contain JSON primitives or malformed lines: reject them rather than accessing object fields blindly.
 
 Use provider-managed authentication without reading credential files or Keychain. Match any cached observation to the current provider account before reuse; derive a non-reversible local identity fingerprint, never persist raw email/account identifiers.
+
+Activity feature exception (approved 2026-09-28): the separate local activity importer may parse session files for allowlisted usage metadata under `architecture/activity.md`. It does not change quota authentication or associate imported activity with the signed-in account.

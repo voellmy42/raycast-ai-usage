@@ -9,6 +9,8 @@ import {
   environment,
   getPreferenceValues,
   openExtensionPreferences,
+  launchCommand,
+  LaunchType,
 } from "@raycast/api";
 import type { Usage, Preferences, QuotaWindow } from "../lib/types";
 import { claudeCaptureCommand } from "../lib/claude-setup";
@@ -70,6 +72,16 @@ export function UsageActions({
         />
       </ActionPanel.Section>
       <ActionPanel.Section>
+        <Action
+          title="Show Activity Graphs"
+          icon={Icon.BarChart}
+          onAction={() =>
+            launchCommand({
+              name: "show-ai-activity",
+              type: LaunchType.UserInitiated,
+            })
+          }
+        />
         <Action
           title="Refresh Usage"
           icon={Icon.ArrowClockwise}

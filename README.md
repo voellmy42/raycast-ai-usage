@@ -42,9 +42,23 @@ Use **Show Codex**, **Show Claude**, and **Show Gemini** to control which provid
 
 Manual verification: pin two different quota windows in turn; switch to automatic selection; test both display styles; hide the selected provider and then all providers; restore providers from preferences; restart Raycast to check persistence. The dashboard and new Actions entries were visually verified in native Raycast. Full preference, pin/relaunch, and restart-persistence checks remain manual.
 
+## Activity graphs and forecasts
+
+Search **Show AI Activity** in Raycast, or choose **Show Activity Graphs** from the quota dashboard’s Actions menu. Select the last **7, 30, or 90 days** to see daily token bars, then select a model for its own graph and token breakdown. Colors remain consistent across date ranges within the imported history; the six largest models in the retained history have individual colors, and others share gray.
+
+The importer reads local Codex session JSONL (including an optional archived-sessions directory) and Claude Code project JSONL. Default roots are `~/.codex` and `~/.claude`; `CODEX_HOME` and `CLAUDE_CONFIG_DIR` are honored when present in Raycast’s environment. Provider visibility preferences also control imports. Gemini activity is not supported. Records can include internal model labels such as `codex-auto-review`; these labels do not imply a user-selectable model or a separate quota.
+
+Token totals include input and output. Cached input is included once, with cache reads and writes shown separately; reasoning tokens are already part of output. Repeated cumulative observations and streamed message records are deduplicated. Initial inherited Codex totals are not counted as new work. These are local records, potentially spanning multiple accounts, not a complete account usage report. Blank days mean no local records. Imported token history cannot reconstruct past subscription quota.
+
+Only timestamps, model identifiers, token counts, hashed event/source keys, and file signatures are cached. No prompts, responses, or credentials are retained. Opening Activity or choosing **Refresh Activity and Quotas** imports history; unchanged files reuse the cache, while changed files are streamed again. Activity retains up to 90 local calendar days. Scans are bounded to 5,000 files, 4 GB of changed input, 512 MB per file, and 25,000 records; lines over two million characters are discarded before buffering their complete bodies. Import notes flag skipped or unavailable data. The cache is disposable and reconstructed from source if damaged.
+
+**Quota Forecasts** estimate exhaustion and headroom at reset from percentage-point consumption, independently for each quota window. They need at least three fresh readings spanning ten minutes, exclude long gaps and quota decreases, and never extrapolate across resets. The enabled menu bar records readings on its five-minute refresh; the dashboard and Activity also capture readings when opened or manually refreshed. When the menu is hidden there is no background sampling. A forecast is conditional on the recent pace continuing, not a guarantee. Flat readings do not produce a finite exhaustion time.
+
+Codex quota observations are partitioned by verified account fingerprint. Claude observations are partitioned by snapshot source, whose current account cannot be verified. Old snapshots are pruned when that source is refreshed. Model details show explicit current model-scoped quotas when the provider reports a matching model; shared account quota is not divided among models. Model-switch savings estimates remain unavailable without attributable measurements.
+
 ## Codex setup
 
-Sign in to the Codex CLI or ChatGPT application with your ChatGPT account. The extension uses the installed Codex App Server and its provider-managed authentication. It doesn't generate model content, change logins, read conversation files, or consume earned resets.
+Sign in to the Codex CLI or ChatGPT application with your ChatGPT account. The extension uses the installed Codex App Server and its provider-managed authentication. Quota collection doesn't generate model content, change logins, or consume earned resets. The separate Activity command reads local session files only to extract usage metadata.
 
 ChatGPT/Codex application installations and common CLI paths are detected automatically. If necessary, set **Codex Executable** to an absolute path in extension preferences. If the global npm launcher is broken, select a working executable bundled with ChatGPT instead:
 
@@ -82,7 +96,7 @@ Snapshots update during Claude Code activity after the provider supplies quota f
 
 ## Privacy and failures
 
-Data stays local. The extension talks to the installed Codex App Server, which contacts its own provider. It stores only normalized Codex quota observations and a hashed account identity in Raycast LocalStorage. It does not store raw email addresses, account IDs, passwords, conversation content, or provider error bodies. Claude quota snapshots are local files at the user-selected path. No analytics or hosted backend is included.
+Data stays local. The extension talks to the installed Codex App Server, which contacts its own provider. It stores the latest normalized Codex quota observation and a hashed account identity in Raycast LocalStorage. Activity adds a usage-only file cache and quota history in the extension’s local support directory. It does not store raw email addresses, account IDs, passwords, conversation content, or provider error bodies. Claude quota snapshots are local files at the user-selected path. No analytics or hosted backend is included.
 
 Codex identity is checked before cached observations are reused. Account switches discard the old observation; authentication errors never show old quotas. A failed quota read may show the previous observation only after verifying that the account still matches, with a stale/error label. Unknown reset times and missing fields are displayed explicitly.
 

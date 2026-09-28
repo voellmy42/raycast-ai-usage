@@ -1,5 +1,13 @@
 # Changelog
 
+## Activity graphs and quota forecasts — 2026-09-28
+
+- Added Show AI Activity with 7/30/90-day stacked token graphs and per-model token/cache breakdowns.
+- Imported local Codex and Claude Code usage metadata with deduplication, bounded streaming, and an incremental file cache.
+- Added account/source-partitioned quota history and conditional forecasts against each reset time.
+- Added dashboard navigation to Activity and explicit coverage/insufficient-history states.
+
+
 ## Menu personalization - 2026-09-28
 
 - Pin a quota window or automatically follow a provider’s lowest remaining quota.

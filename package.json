@@ -21,6 +21,12 @@
       "mode": "view"
     },
     {
+      "name": "show-ai-activity",
+      "title": "Show AI Activity",
+      "description": "Explore local token history, model activity, and quota forecasts",
+      "mode": "view"
+    },
+    {
       "name": "ai-usage-menu-bar",
       "title": "AI Usage Menu Bar",
       "description": "Keep AI account quotas in the menu bar",

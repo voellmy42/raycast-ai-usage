@@ -1,4 +1,5 @@
 import { Color, Icon, List } from "@raycast/api";
+import { forecast, forecastText, type QuotaObservation } from "../lib/forecast";
 import type { QuotaWindow, Usage } from "../lib/types";
 import {
   connectionLabel,
@@ -24,9 +25,11 @@ export function quotaColor(
 export function QuotaDetail({
   usage,
   window,
+  observations,
 }: {
   usage: Usage;
   window?: QuotaWindow;
+  observations?: QuotaObservation[];
 }) {
   const heading = `## ${markdownEscape(usage.account.label)}${usage.account.plan ? ` · ${markdownEscape(usage.account.plan)}` : ""}`;
   const snapshot = usage.source === "claude_statusline_snapshot";
@@ -50,7 +53,7 @@ export function QuotaDetail({
         : "Sign in to Codex with your ChatGPT account, then refresh. If Codex cannot be found, select its executable in extension preferences.";
   const body =
     window && capacity
-      ? `### ${markdownEscape(shortQuotaLabel(window))}\n\n# ${capacity.remaining === null ? "—" : percent(capacity.remaining)}\n\n${capacity.state === "stale" ? "remaining at last observation" : capacity.remaining === null ? capacity.label : "remaining"}${meter}\n\n**${capacity.label}**\n\n${resetText(window)}\n\n${observationText(usage)}`
+      ? `### ${markdownEscape(shortQuotaLabel(window))}\n\n# ${capacity.remaining === null ? "—" : percent(capacity.remaining)}\n\n${capacity.state === "stale" ? "remaining at last observation" : capacity.remaining === null ? capacity.label : "remaining"}${meter}\n\n**${capacity.label}**\n\n${resetText(window)}\n\n${observationText(usage)}${observations ? `\n\n### Forecast\n\n${forecastText(forecast(window, old ? [] : observations))}` : ""}`
       : `### ${connectionLabel(usage)}\n\n${setup}`;
   return (
     <List.Item.Detail

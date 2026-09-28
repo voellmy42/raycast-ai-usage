@@ -12,7 +12,7 @@
 
 ## Execution prerequisite
 
-The planning skill references `superpowers:executing-plans`. It is absent from the available catalog and was not found under ~/.agents/skills, ~/.codex/skills, or ~/.codex/plugins. Resolve this missing prerequisite or obtain authorization to execute the plan directly before implementation.
+The planning skill references `superpowers:executing-plans`. It is absent from the available catalog and was not found under ~/.agents/skills, ~/.codex/skills, or ~/.codex/plugins. The user explicitly authorized executing the plan directly without that skill on 2026-09-28.
 
 ### Task 1: Verify historical formats and update source policies
 
@@ -74,3 +74,15 @@ Files: `README.md`, `CHANGELOG.md`, `architecture/activity.md`, this plan.
 3. Verify real import using aggregate-only diagnostics. Confirm a second import does not inflate totals.
 4. Open the native Raycast command; inspect 7/30/90-day charts, model rows, empty states, forecast states, and light/dark themes. Record any checks that cannot be performed.
 5. Update completion notes and commit the verified implementation.
+
+
+## Implementation notes
+
+- Implemented direct execution with user authorization. Source contracts were verified using usage-only extraction from local records; tests use synthetic records rather than copying private logs.
+- Changed-file reparsing replaces byte-offset checkpoints: it safely handles appends, rewrites, truncation, and partial lines without persisting complex parser state. Unchanged files reuse normalized records.
+- A native test caught Raycast’s 100 MB heap limit with Node readline buffering an oversized transcript line. Replaced readline with a bounded, backpressure-aware reader; oversized bodies are discarded before full allocation. Added a recovery regression test.
+- A real import of 116 recent files produced over 9,000 normalized events. Repeating with a fixed cutoff gave identical totals; the initial bounded import took about two seconds, and the cached pass about 30 ms in an 80 MB Node heap. Exact totals change with active sessions.
+- Native dark-theme verification covered the 7/30/90-day graphs, model detail tables, and the honest insufficient-history forecast state. Forecast math uses synthetic cases for before/after reset, flat usage, stale data, discontinuities, and changed resets.
+- Standalone `npm run lint` reaches ESLint and formatting successfully but manifest validation rejects the pre-existing author `voellmy` (Raycast API returns 404). No author identity was invented or changed.
+
+- Final checks: 43 tests passed; TypeScript, the local build, ESLint for source/TypeScript tests, and formatting passed. The final build was installed locally. Native light-theme verification and a populated live forecast remain unverified; forecast calculations and both chart themes have fixture coverage. Computer Use timed out on the final UI reconnect after earlier successful native checks.
