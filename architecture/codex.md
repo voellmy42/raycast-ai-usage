@@ -8,4 +8,6 @@ Validate all responses. Prefer the multi-bucket view and preserve nullable windo
 
 Bound process output and per-request timeouts. Ignore notifications and reject unsupported server requests. On failure settle pending requests, sanitize errors, and terminate the child process. Never print raw account objects, credentials, or raw provider errors.
 
+Verified with bundled CLI 0.158.0-alpha.2.1. The global npm launcher fails with ENOENT. Sandboxed CLI startup failed because the provider runtime needs its normal account-storage permissions; the same read-only handshake succeeds with host execution permissions. Protocol output may contain JSON primitives or malformed lines: reject them rather than accessing object fields blindly.
+
 Use provider-managed authentication without reading credential files or Keychain. Match any cached observation to the current provider account before reuse; derive a non-reversible local identity fingerprint, never persist raw email/account identifiers.

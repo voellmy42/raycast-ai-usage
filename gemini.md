@@ -1,7 +1,7 @@
 # Project Constitution
 
 ## State
-Design, Blueprint, native runtime adaptation, and proposed payload approved by the user on 2026-09-28. Implementation plan prepared; connectivity verification pending.
+Design, Blueprint, native runtime adaptation, and proposed payload approved on 2026-09-28. User authorized direct execution. Codex-first development extension implemented and registered; Claude live verification, Gemini connection, visual verification, and Store submission remain pending.
 
 ## Data schemas
 The following JSON contracts were approved with the design on 2026-09-28.
@@ -69,4 +69,4 @@ activity, when supported, contains periodStart and periodEnd (nullable timestamp
 - Runtime payload is delivered within Raycast; public distribution requires Raycast Store submission and review.
 
 ## Maintenance log
-No deployed system yet.
+2026-09-28: Local Raycast development build registered with Show AI Usage and AI Usage Menu Bar. Codex adapter live-tested with ChatGPT Plus through bundled CLI 0.158.0-alpha.2.1. Claude snapshot helper and normalization tested with fixtures; current CLI 2.1.150 is below documented quota-field requirement. Gemini internal service route identified but not implemented without a verified supported interface. 20 automated tests and TypeScript/code-style checks passed. No public Store release yet; actual author handle, native screenshots, and provider live checks are pending. See README and architecture SOPs for setup, refresh behavior, failure recovery, and account/privacy constraints.

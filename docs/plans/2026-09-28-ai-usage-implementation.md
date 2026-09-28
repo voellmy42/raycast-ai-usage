@@ -10,7 +10,7 @@
 
 **Approved design:** docs/plans/2026-09-28-ai-usage-design.md.
 
-**Execution constraint:** The required executing-plans skill was not found in installed skill roots or plugin caches. Resolve its availability or obtain an explicit exception before executing this plan. Planning itself is authorized and complete.
+**Execution exception:** The required executing-plans skill was not found in installed skill roots or plugin caches. The user explicitly instructed direct execution on 2026-09-28. Planning and direct implementation are authorized.
 
 ---
 
@@ -85,7 +85,7 @@ Files: architecture/refresh.md; src/lib/cache.ts; src/lib/refresh.ts; src/hooks/
 
 ## Task 7: Claude Code Link and snapshot adapter
 
-Files: architecture/claude.md; scripts/claude-statusline.cjs; src/providers/claude.ts; tests/claude.test.ts; README.md.
+Files: architecture/claude.md; assets/claude-statusline.cjs; src/providers/claude.ts; tests/claude-helper.test.ts; README.md.
 
 1. Verify installed Claude Code version and documented status-line fields. Do not read Keychain or export OAuth tokens.
 2. Write an opt-in status-line integration SOP and installation instructions that preserve any existing status-line command. The approved design does not authorize automatic replacement of user configuration.

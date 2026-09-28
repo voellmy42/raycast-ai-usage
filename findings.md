@@ -18,3 +18,14 @@
 - Existing project worth assessing for integration patterns and CLI reuse: CodexBar (MIT), https://github.com/steipete/CodexBar. Its capabilities should not be assumed to meet Raycast Store requirements automatically.
 - Proposed platform adaptation, pending design approval: native Raycast TypeScript/React, with deterministic provider adapters and SOPs rather than a required Python runtime; Raycast is the runtime delivery destination and the Store is the distribution destination.
 - Gemini CLI documentation distinguishes Google login subscription quotas from API-key/Vertex usage. A stable external quota-reading interface remains unverified: https://geminicli.com/docs/resources/quota-and-pricing/ and https://geminicli.com/docs/reference/commands/
+
+## Implementation discoveries — 2026-09-28
+- Working provider-managed Codex executable is bundled inside ChatGPT.app. Verified CLI version: 0.158.0-alpha.2.1. The global npm launcher is broken; no global software installation was changed.
+- Read-only initialize/account/rateLimits handshake succeeds with host permissions, returning ChatGPT Plus, five-hour and weekly quotas, and an additional independently metered bucket. The completed adapter also succeeded against the live account and preserves source-provided labels, which can differ from earlier responses.
+- Raycast API 2.5.2 and project dependencies installed; npm audit reported no vulnerabilities during installation.
+- Claude Code version is 2.1.150, below the current documented 2.1.251 quota status-line requirement. Snapshot helper/parser verified with synthetic fixtures; live Claude account verification remains pending.
+- Gemini CLI version is 0.61.0. Its official source exports quota retrieval in CodeAssistServer, but the underlying endpoint is v1internal, not a documented third-party quota API: https://raw.githubusercontent.com/google-gemini/gemini-cli/main/packages/core/src/code_assist/server.ts . The choice of supported versus experimental connector was requested from the user; no internal credential/API connector was implemented.
+- Raycast full manifest lint confirmed username voellmy returns HTTP 404. The actual author handle is required before Store submission.
+- Native Computer Use returned permissions not granted. No screenshot or native interaction was verified. Raycast CLI development build succeeded and copied both commands and assets into its local extension directory.
+- tsx CLI tries to create an IPC socket blocked by the workspace sandbox; `node --import tsx --test` runs the same tests successfully without that IPC dependency.
+- Raycast build can target the workspace dist directory explicitly for sandbox-friendly validation. Default development output requires access to Raycast's configuration directory.

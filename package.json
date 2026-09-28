@@ -1,0 +1,68 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "ai-usage",
+  "title": "AI Usage",
+  "description": "View Codex subscription usage and Claude Code quota snapshots in Raycast.",
+  "icon": "icon.png",
+  "author": "voellmy",
+  "platforms": [
+    "macOS"
+  ],
+  "categories": [
+    "Developer Tools",
+    "Productivity"
+  ],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "show-ai-usage",
+      "title": "Show AI Usage",
+      "description": "Check connected AI account quotas and reset times",
+      "mode": "view"
+    },
+    {
+      "name": "ai-usage-menu-bar",
+      "title": "AI Usage Menu Bar",
+      "description": "Keep AI account quotas in the menu bar",
+      "mode": "menu-bar",
+      "interval": "5m"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "codexPath",
+      "title": "Codex Executable",
+      "description": "Optional absolute path to a working Codex executable. ChatGPT and Codex app installations are detected automatically.",
+      "type": "textfield",
+      "required": false
+    },
+    {
+      "name": "claudeSnapshot",
+      "title": "Claude Usage Snapshot",
+      "description": "Optional path to a snapshot captured by the included Claude Code status-line helper. See README for setup and required version.",
+      "type": "file",
+      "required": false
+    }
+  ],
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "publish": "npx @raycast/api@latest publish"
+  },
+  "dependencies": {
+    "@raycast/api": "2.5.2",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
