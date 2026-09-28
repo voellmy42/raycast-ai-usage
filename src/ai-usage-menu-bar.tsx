@@ -57,6 +57,13 @@ function VisibleMenu({ hide }: { hide: () => Promise<void> }) {
       tooltip={`AI Usage · ${stale ? "Last observed" : "Lowest remaining"} Codex quota`}
       isLoading={loading}
     >
+      <MenuBarExtra.Section>
+        <MenuBarExtra.Item
+          title="Hide Menu Bar"
+          icon={Icon.EyeDisabled}
+          onAction={hide}
+        />
+      </MenuBarExtra.Section>
       {usages.map((usage) => (
         <MenuBarExtra.Section
           key={usage.provider}
@@ -84,11 +91,6 @@ function VisibleMenu({ hide }: { hide: () => Promise<void> }) {
           title="Refresh Usage"
           icon={Icon.ArrowClockwise}
           onAction={() => refresh(true)}
-        />
-        <MenuBarExtra.Item
-          title="Hide Menu Bar"
-          icon={Icon.EyeDisabled}
-          onAction={hide}
         />
         <MenuBarExtra.Item
           title="Open Extension Preferences"

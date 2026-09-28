@@ -32,3 +32,8 @@
 - Generated final transparent icon using built-in imagegen; preserved original under media and saved the new 512px asset at assets/icon-v2.png. Prompt recorded in the UI implementation plan.
 - 26 tests pass; TypeScript, source/test TypeScript ESLint, Prettier, and distribution build pass. Full Raycast lint passes icon/code/style but fails author voellmy (404). Broad standalone ESLint over the existing CommonJS test fixture flags its required require import; fixture is unchanged.
 - Native visual/persistence retest remains with the user because Computer Use permissions are unavailable. Provider and publication prerequisites recorded in docs/store-readiness.md.
+
+### Menu-control discoverability fix
+- User could not find Hide and requested a fix plus a dev-mode restart. Reused the approved menu visibility design; promoted the toggle instead of adding new commands.
+- Dashboard now receives a complete native ActionPanel with Hide/Show as its direct first action, exposing it in the footer. Added Cmd+Shift+M; Cmd+R still refreshes usage. Hide is the first menu-bar dropdown item.
+- All 26 tests, TypeScript, ESLint, Prettier, and dev compilation pass. Stopped the previous development watcher and started a fresh terminal-backed watcher (session 15913). Verified registered bundles contain the new action order and shortcut. Native appearance still requires user retest.

@@ -7,3 +7,4 @@
 - Codex App Server connection, multiple quota windows, provider reset times, and account-aware cache.
 - Opt-in Claude Code quota snapshot helper; current live version prerequisite documented.
 - Gemini connector investigation state, explicitly unavailable until verified.
+- Hide/show menu-bar control exposed as the primary dashboard action with Cmd+Shift+M, and Hide placed at the top of the menu dropdown.

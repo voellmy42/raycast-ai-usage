@@ -1,4 +1,4 @@
-import { ActionPanel, Icon, List } from "@raycast/api";
+import { Icon, List } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { useUsage } from "./hooks/use-usage";
 import { useMenuVisibility } from "./hooks/use-menu-visibility";
@@ -65,13 +65,11 @@ export default function ShowAIUsage() {
                   ]}
                   detail={<QuotaDetail usage={usage} window={window} />}
                   actions={
-                    <ActionPanel>
-                      <UsageActions
-                        usage={usage}
-                        refresh={() => void refresh(true)}
-                        visibility={visibility}
-                      />
-                    </ActionPanel>
+                    <UsageActions
+                      usage={usage}
+                      refresh={() => void refresh(true)}
+                      visibility={visibility}
+                    />
                   }
                 />
               );
@@ -91,13 +89,11 @@ export default function ShowAIUsage() {
               }
               detail={<QuotaDetail usage={usage} />}
               actions={
-                <ActionPanel>
-                  <UsageActions
-                    usage={usage}
-                    refresh={() => void refresh(true)}
-                    visibility={visibility}
-                  />
-                </ActionPanel>
+                <UsageActions
+                  usage={usage}
+                  refresh={() => void refresh(true)}
+                  visibility={visibility}
+                />
               }
             />
           )}

@@ -26,7 +26,13 @@ export function UsageActions({
   visibility: MenuVisibilityControl;
 }) {
   return (
-    <>
+    <ActionPanel>
+      <Action
+        title={visibility.visible ? "Hide Menu Bar" : "Show Menu Bar"}
+        icon={visibility.visible ? Icon.EyeDisabled : Icon.Eye}
+        shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
+        onAction={() => visibility.change(!visibility.visible, true)}
+      />
       <ActionPanel.Section>
         <Action
           title="Refresh Usage"
@@ -47,19 +53,12 @@ export function UsageActions({
             )}
           />
         ) : null}
-      </ActionPanel.Section>
-      <ActionPanel.Section title="Appearance">
-        <Action
-          title={visibility.visible ? "Hide Menu Bar" : "Show Menu Bar"}
-          icon={visibility.visible ? Icon.EyeDisabled : Icon.Eye}
-          onAction={() => visibility.change(!visibility.visible, true)}
-        />
         <Action
           title="Open Extension Preferences"
           icon={Icon.Gear}
           onAction={openExtensionPreferences}
         />
       </ActionPanel.Section>
-    </>
+    </ActionPanel>
   );
 }

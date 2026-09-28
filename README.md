@@ -28,7 +28,7 @@ In Raycast, search **Show AI Usage**. The optional **AI Usage Menu Bar** command
 
 Select a quota window in **Show AI Usage** to see its remaining capacity, reset countdown, source, and account scope in the native detail panel. Unknown and expired observations never appear as unused quota. Snapshot age and refresh failures remain visible.
 
-To remove the icon, select **Hide Menu Bar** in its menu, or open dashboard Actions (`⌘K`) and select **Hide Menu Bar**. To restore it, choose **Show Menu Bar** in dashboard Actions. The choice is saved across scheduled refreshes and command relaunches. When hidden, the menu command does not check providers; the dashboard still works normally. Raycast's command must remain enabled in extension settings for the dashboard to launch it.
+To remove the icon, select **Hide Menu Bar** at the top of its menu, or select any dashboard row and use the primary **Hide Menu Bar** action shown in Raycast's bottom bar. The shortcut **⌘⇧M** toggles visibility from the dashboard. To restore the icon, use the primary **Show Menu Bar** action. Both controls also appear in Actions (`⌘K`). The choice is saved across scheduled refreshes and command relaunches. When hidden, the menu command does not check providers; the dashboard still works normally. Raycast's command must remain enabled in extension settings for the dashboard to launch it.
 
 For this refresh, retest: open the dashboard and select several quota windows; hide the menu icon; reopen the dashboard and confirm it stays hidden; leave it hidden through the next five-minute refresh; show it again through Actions; restart Raycast and check the saved choice. Check the layout in light and dark themes.
 
