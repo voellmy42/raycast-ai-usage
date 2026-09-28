@@ -3,7 +3,7 @@
   "name": "ai-usage",
   "title": "AI Usage",
   "description": "View Codex subscription usage and Claude Code quota snapshots in Raycast.",
-  "icon": "icon.png",
+  "icon": "icon-v2.png",
   "author": "voellmy",
   "platforms": [
     "macOS"

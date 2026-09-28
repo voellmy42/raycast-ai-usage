@@ -35,3 +35,54 @@ export function observationText(usage: Usage): string {
 export function markdownEscape(value: string): string {
   return value.replace(/[\\`*_{}[\]()#+.!|<>]/g, "\\$&");
 }
+
+export function shortQuotaLabel(window: QuotaWindow): string {
+  return window.label.replace(/^Codex\s*·\s*/i, "");
+}
+export function quotaPresentation(
+  window: QuotaWindow,
+  stale = false,
+  now = Date.now(),
+) {
+  if (isExpired(window, now))
+    return {
+      remaining: null,
+      state: "expired",
+      label: "Refresh required",
+    } as const;
+  const remaining = remainingPercent(window.usedPercent);
+  if (remaining === null)
+    return {
+      remaining,
+      state: "unknown",
+      label: "Capacity unavailable",
+    } as const;
+  if (stale)
+    return {
+      remaining,
+      state: "stale",
+      label: "Last observed capacity",
+    } as const;
+  if (remaining <= 10)
+    return { remaining, state: "low", label: "Low capacity" } as const;
+  if (remaining <= 25)
+    return {
+      remaining,
+      state: "approaching",
+      label: "Approaching limit",
+    } as const;
+  return {
+    remaining,
+    state: "available",
+    label: "Capacity available",
+  } as const;
+}
+export function connectionLabel(usage: Usage) {
+  if (usage.connectionStatus === "sign_in_required") return "Sign In Required";
+  if (usage.connectionStatus === "error") return "Connection Failed";
+  if (usage.connectionStatus === "unsupported")
+    return usage.provider === "gemini"
+      ? "Coming Later"
+      : "Account Not Supported";
+  return "Set Up Connection";
+}

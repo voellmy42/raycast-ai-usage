@@ -22,3 +22,13 @@
 - Started Raycast development registration/watch via npm run dev (exec session 29841); both commands and assets are present in the local development directory. Native screen verification and screenshots remain blocked by absent Computer Use permissions.
 - Full Store lint is blocked by an invalid/unverified author handle (voellmy returns HTTP 404). Requested the actual Raycast username. No publication or PR created.
 - Claude needs a compatible CLI/account and user-controlled status-line setup for live verification. Gemini requires a supported connection route or user choice about an experimental internal integration. API spending remains the approved subsequent phase.
+- User tested the initial UI and reported it looks good; requested visual improvements and a more modern logo, followed by another testing handoff.
+- Reviewed current native views and generated a logo draft with built-in imagegen for visual-direction review. Proposed a native split view; implementation of this UI refresh awaits design approval under the user's workflow gate.
+- User requested an explicit menu-bar off control. Added persisted hide/show behavior to the proposed UI refresh design and verified Raycast's documented null-return removal mechanism. Combined design approval remains pending.
+
+### Approved visual and menu-bar update
+- User approved native split view, modern orbital logo, and persistent show/hide controls on 2026-09-28; planning followed design approval.
+- Implemented inline quota detail, semantic capacity states, countdown/age updates, friendly setup panels, and local visibility with a synchronous mirror. Hidden menu invocations return null before provider hooks mount.
+- Generated final transparent icon using built-in imagegen; preserved original under media and saved the new 512px asset at assets/icon-v2.png. Prompt recorded in the UI implementation plan.
+- 26 tests pass; TypeScript, source/test TypeScript ESLint, Prettier, and distribution build pass. Full Raycast lint passes icon/code/style but fails author voellmy (404). Broad standalone ESLint over the existing CommonJS test fixture flags its required require import; fixture is unchanged.
+- Native visual/persistence retest remains with the user because Computer Use permissions are unavailable. Provider and publication prerequisites recorded in docs/store-readiness.md.

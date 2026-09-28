@@ -29,3 +29,7 @@
 - Native Computer Use returned permissions not granted. No screenshot or native interaction was verified. Raycast CLI development build succeeded and copied both commands and assets into its local extension directory.
 - tsx CLI tries to create an IPC socket blocked by the workspace sandbox; `node --import tsx --test` runs the same tests successfully without that IPC dependency.
 - Raycast build can target the workspace dist directory explicitly for sandbox-friendly validation. Default development output requires access to Raycast's configuration directory.
+- UI refresh discovery: Raycast documents returning null from a menu-bar command to remove its item. Store a local visibility choice, expose hide/show actions, and skip menu-bar provider polling while hidden; never directly modify Raycast command preferences.
+
+- Raycast Cache is synchronous, shared across extension commands, and evictable; use LocalStorage as visibility source and a Cache mirror to suppress initial hidden-menu flashes. Provider hooks mount only after visible settings are loaded.
+- Store guidelines require a valid Raycast author handle, 512px PNG, distribution testing, provider terms review, and recommend three real 2000×1250 screenshots. Current submission blockers are author verification, native retest, live Claude verification, and Gemini/API support scope.

@@ -1,18 +1,29 @@
-import { Action, ActionPanel, Color, Icon, List } from "@raycast/api";
+import { ActionPanel, Icon, List } from "@raycast/api";
+import { useEffect, useState } from "react";
 import { useUsage } from "./hooks/use-usage";
-import { UsageActions, UsageDetails } from "./components/usage-details";
+import { useMenuVisibility } from "./hooks/use-menu-visibility";
+import { UsageActions } from "./components/usage-details";
+import { QuotaDetail, quotaColor } from "./components/quota-detail";
 import {
-  isExpired,
+  connectionLabel,
   observationText,
-  quotaSummary,
-  resetText,
+  percent,
+  quotaPresentation,
+  shortQuotaLabel,
 } from "./lib/format";
 
 export default function ShowAIUsage() {
   const { usages, loading, refresh } = useUsage();
+  const visibility = useMenuVisibility();
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const timer = setInterval(() => tick((value) => value + 1), 60_000);
+    return () => clearInterval(timer);
+  }, []);
   return (
     <List
       isLoading={loading}
+      isShowingDetail
       searchBarPlaceholder="Search providers and quota windows…"
     >
       {usages.map((usage) => (
@@ -20,80 +31,71 @@ export default function ShowAIUsage() {
           key={usage.provider}
           title={`${usage.account.label}${usage.account.plan ? ` · ${usage.account.plan}` : ""}`}
           subtitle={
-            usage.provider === "claude"
-              ? `Snapshot · ${observationText(usage)}`
-              : observationText(usage)
+            usage.provider === "claude" ? "Snapshot" : observationText(usage)
           }
         >
           {usage.quotaWindows.length ? (
-            usage.quotaWindows.map((window) => (
-              <List.Item
-                key={window.id}
-                title={window.label}
-                icon={{
-                  source: isExpired(window) ? Icon.Clock : Icon.Gauge,
-                  tintColor:
-                    isExpired(window) || usage.freshness === "stale"
-                      ? Color.SecondaryText
-                      : (window.usedPercent ?? 0) >= 90
-                        ? Color.Red
-                        : Color.Green,
-                }}
-                subtitle={quotaSummary(window)}
-                accessories={[
-                  { text: resetText(window) },
-                  {
-                    tag:
-                      usage.connectionStatus === "error"
-                        ? "Refresh Failed"
-                        : usage.freshness,
-                  },
-                ]}
-                actions={
-                  <ActionPanel>
-                    <Action.Push
-                      title="View Usage Details"
-                      icon={Icon.List}
-                      target={<UsageDetails usage={usage} />}
-                    />
-                    <UsageActions
-                      usage={usage}
-                      refresh={() => void refresh(true)}
-                    />
-                  </ActionPanel>
-                }
-              />
-            ))
+            usage.quotaWindows.map((window) => {
+              const stale =
+                usage.freshness === "stale" ||
+                usage.connectionStatus === "error" ||
+                (usage.observedAt !== null &&
+                  Date.now() - Date.parse(usage.observedAt) > 300_000);
+              const capacity = quotaPresentation(window, stale);
+              return (
+                <List.Item
+                  key={window.id}
+                  id={`${usage.provider}:${window.id}`}
+                  title={shortQuotaLabel(window)}
+                  icon={{
+                    source:
+                      capacity.state === "expired" ? Icon.Clock : Icon.Gauge,
+                    tintColor: quotaColor(capacity.state),
+                  }}
+                  accessories={[
+                    {
+                      text:
+                        capacity.state === "expired"
+                          ? "Refresh"
+                          : capacity.remaining === null
+                            ? "Unknown"
+                            : `${percent(capacity.remaining)} left`,
+                    },
+                    ...(stale ? [{ tag: "Stale" }] : []),
+                  ]}
+                  detail={<QuotaDetail usage={usage} window={window} />}
+                  actions={
+                    <ActionPanel>
+                      <UsageActions
+                        usage={usage}
+                        refresh={() => void refresh(true)}
+                        visibility={visibility}
+                      />
+                    </ActionPanel>
+                  }
+                />
+              );
+            })
           ) : (
             <List.Item
-              title={usage.account.label}
+              id={usage.provider}
+              title={
+                loading && usage.provider === "codex"
+                  ? "Connecting…"
+                  : connectionLabel(usage)
+              }
               icon={
                 usage.connectionStatus === "error"
                   ? Icon.ExclamationMark
                   : Icon.Plug
               }
-              subtitle={
-                loading && usage.provider === "codex"
-                  ? "Connecting…"
-                  : usage.connectionStatus.replaceAll("_", " ")
-              }
-              accessories={[
-                {
-                  text:
-                    usage.provider === "gemini"
-                      ? "Integration Pending"
-                      : "Setup Required",
-                },
-              ]}
+              detail={<QuotaDetail usage={usage} />}
               actions={
                 <ActionPanel>
-                  <Action.Push
-                    title="View Connection Details"
-                    target={<UsageDetails usage={usage} />}
-                  />
                   <UsageActions
                     usage={usage}
                     refresh={() => void refresh(true)}
+                    visibility={visibility}
                   />
                 </ActionPanel>
               }

@@ -28,7 +28,7 @@ Document SOPs before implementing deterministic, testable TypeScript provider ad
 - [x] Provider SOPs, normalized contract, subprocess lifecycle, and account cache.
 - [x] Codex live adapter, native dashboard/details, and menu bar.
 - [x] Claude opt-in snapshot helper and reader, tested with fixtures.
-- [x] 20 automated tests, type check, ESLint, and formatting.
+- [x] 26 automated tests, type check, ESLint, and formatting.
 - [ ] Gemini live adapter, after connectivity verification.
 
 ## S — Stylize
@@ -46,3 +46,10 @@ Deliver within Raycast, prepare public Store submission, configure any approved 
 - [ ] Confirm actual Raycast author handle and pass full manifest lint.
 - [ ] Submit complete, accurately documented extension for Store review.
 - [ ] Store acceptance (external milestone).
+
+## Approved UI refresh
+- [x] Native split dashboard and capacity presentation.
+- [x] New 512px orbital icon.
+- [x] Persistent menu-bar hide/show controls with hidden provider reads suppressed.
+- [x] Distribution build installed; Store lint passes icon/code/style checks and still fails unverified author.
+- [ ] User retest in native Raycast, including scheduled refresh and restart persistence.
