@@ -22,7 +22,7 @@ npm ci
 npm run dev
 ```
 
-In Raycast, search **Show AI Usage**. The optional **AI Usage Menu Bar** command shows the lowest remaining available Codex quota and refreshes every five minutes when enabled. The main dashboard refreshes when opened and offers a manual refresh action. Native visual verification is pending on this development machine because Computer Use access is unavailable.
+In Raycast, search **Show AI Usage**. The optional **AI Usage Menu Bar** command shows your selected quota (by default, the lowest remaining available Codex quota) and refreshes every five minutes when enabled. The main dashboard refreshes when opened and offers a manual refresh action. The dashboard and personalization actions have been visually checked in native Raycast.
 
 ## Dashboard and menu-bar controls
 
@@ -31,6 +31,16 @@ Select a quota window in **Show AI Usage** to see its remaining capacity, reset 
 To remove the icon, select **Hide Menu Bar** at the top of its menu, or select any dashboard row and use the primary **Hide Menu Bar** action shown in Raycast's bottom bar. The shortcut **⌘⇧M** toggles visibility from the dashboard. To restore the icon, use the primary **Show Menu Bar** action. Both controls also appear in Actions (`⌘K`). The choice is saved across scheduled refreshes and command relaunches. When hidden, the menu command does not check providers; the dashboard still works normally. Raycast's command must remain enabled in extension settings for the dashboard to launch it.
 
 For this refresh, retest: open the dashboard and select several quota windows; hide the menu icon; reopen the dashboard and confirm it stays hidden; leave it hidden through the next five-minute refresh; show it again through Actions; restart Raycast and check the saved choice. Check the layout in light and dark themes.
+
+## Personalize the menu bar
+
+Select a quota window in **Show AI Usage**, open Actions (`⌘K`), and choose **Show in Menu Bar** to pin it. Choose **Use Provider’s Lowest Remaining Quota** to automatically show the lowest remaining available quota for that row’s provider. Both actions save the choice and show the menu bar; the menu command must be enabled in Raycast.
+
+In extension preferences, choose **Menu Bar Display**: **Compact** shows `42%`; **Detailed** shows a provider and the same quota’s reset countdown, such as `Codex 42% · 2h`. The countdown updates with menu refreshes, normally every five minutes. Claude readings are labeled Snapshot, and old observations are labeled Stale.
+
+Use **Show Codex**, **Show Claude**, and **Show Gemini** to control which providers appear in both views. Hidden providers are not checked. Hiding the selected provider, losing a pinned window, or having only expired/unknown data shows **Unavailable** rather than silently choosing a different quota. Re-enable the provider or select another quota to restore the display. If all providers are hidden, the dashboard offers a preferences action.
+
+Manual verification: pin two different quota windows in turn; switch to automatic selection; test both display styles; hide the selected provider and then all providers; restore providers from preferences; restart Raycast to check persistence. The dashboard and new Actions entries were visually verified in native Raycast. Full preference, pin/relaunch, and restart-persistence checks remain manual.
 
 ## Codex setup
 

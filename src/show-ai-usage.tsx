@@ -1,4 +1,10 @@
-import { Icon, List } from "@raycast/api";
+import {
+  Action,
+  ActionPanel,
+  Icon,
+  List,
+  openExtensionPreferences,
+} from "@raycast/api";
 import { useEffect, useState } from "react";
 import { useUsage } from "./hooks/use-usage";
 import { useMenuVisibility } from "./hooks/use-menu-visibility";
@@ -26,6 +32,20 @@ export default function ShowAIUsage() {
       isShowingDetail
       searchBarPlaceholder="Search providers and quota windows…"
     >
+      {!usages.length ? (
+        <List.EmptyView
+          title="All Providers Hidden"
+          description="Enable a provider in extension preferences."
+          actions={
+            <ActionPanel>
+              <Action
+                title="Open Extension Preferences"
+                onAction={openExtensionPreferences}
+              />
+            </ActionPanel>
+          }
+        />
+      ) : null}
       {usages.map((usage) => (
         <List.Section
           key={usage.provider}
@@ -67,6 +87,7 @@ export default function ShowAIUsage() {
                   actions={
                     <UsageActions
                       usage={usage}
+                      window={window}
                       refresh={() => void refresh(true)}
                       visibility={visibility}
                     />

@@ -1,5 +1,7 @@
 import {
   Icon,
+  LocalStorage,
+  getPreferenceValues,
   MenuBarExtra,
   open,
   openExtensionPreferences,
@@ -9,12 +11,20 @@ import { useUsage } from "./hooks/use-usage";
 import { useMenuVisibility } from "./hooks/use-menu-visibility";
 import {
   connectionLabel,
-  isExpired,
   quotaSummary,
   resetText,
   shortQuotaLabel,
 } from "./lib/format";
 import { usagePages } from "./components/usage-details";
+
+import { useEffect, useState } from "react";
+import {
+  menuPresentation,
+  parseSelection,
+  selectionKey,
+  type MenuSelection,
+} from "./lib/menu-personalization";
+import type { Preferences } from "./lib/types";
 
 export default function AIUsageMenuBar(
   props: LaunchProps<{ launchContext: { visible?: boolean } }>,
@@ -34,28 +44,36 @@ export default function AIUsageMenuBar(
 }
 function VisibleMenu({ hide }: { hide: () => Promise<void> }) {
   const { usages, loading, refresh } = useUsage();
-  const windows = usages[0].quotaWindows.filter(
-    (window) => !isExpired(window) && window.usedPercent !== null,
-  );
-  const remaining = windows.length
-    ? Math.max(
-        0,
-        100 -
-          Math.max(...windows.map((window) => window.usedPercent as number)),
-      )
-    : null;
-  const stale =
-    usages[0].freshness === "stale" || usages[0].connectionStatus === "error";
+  const [selection, setSelection] = useState<MenuSelection>();
+  const [selectionError, setSelectionError] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    void LocalStorage.getItem<string>(selectionKey)
+      .then((raw) => {
+        if (alive) setSelection(parseSelection(raw));
+      })
+      .catch(() => {
+        if (alive) setSelectionError(true);
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const preferences = getPreferenceValues<Preferences>();
+  const presentation = selection
+    ? menuPresentation(usages, selection, preferences.menuStyle)
+    : {
+        title: selectionError ? "Selection unavailable" : undefined,
+        tooltip: selectionError
+          ? "Could not load saved menu selection"
+          : "Loading menu selection…",
+      };
   return (
     <MenuBarExtra
       icon={Icon.Gauge}
-      title={
-        remaining === null
-          ? undefined
-          : `${Math.round(remaining)}%${stale ? " ·" : ""}`
-      }
-      tooltip={`AI Usage · ${stale ? "Last observed" : "Lowest remaining"} Codex quota`}
-      isLoading={loading}
+      title={presentation.title}
+      tooltip={presentation.tooltip}
+      isLoading={loading || (!selection && !selectionError)}
     >
       <MenuBarExtra.Section>
         <MenuBarExtra.Item

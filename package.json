@@ -42,6 +42,51 @@
       "description": "Optional path to a snapshot captured by the included Claude Code status-line helper. See README for setup and required version.",
       "type": "file",
       "required": false
+    },
+    {
+      "name": "menuStyle",
+      "title": "Menu Bar Display",
+      "description": "Show only remaining capacity, or include provider and reset countdown.",
+      "type": "dropdown",
+      "required": false,
+      "default": "compact",
+      "data": [
+        {
+          "title": "Compact",
+          "value": "compact"
+        },
+        {
+          "title": "Detailed",
+          "value": "detailed"
+        }
+      ]
+    },
+    {
+      "name": "codexVisible",
+      "title": "Codex",
+      "label": "Show Codex",
+      "description": "Include Codex in the dashboard and menu.",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "claudeVisible",
+      "title": "Claude",
+      "label": "Show Claude",
+      "description": "Include Claude in the dashboard and menu.",
+      "type": "checkbox",
+      "required": false,
+      "default": true
+    },
+    {
+      "name": "geminiVisible",
+      "title": "Gemini",
+      "label": "Show Gemini",
+      "description": "Include Gemini in the dashboard and menu.",
+      "type": "checkbox",
+      "required": false,
+      "default": true
     }
   ],
   "scripts": {

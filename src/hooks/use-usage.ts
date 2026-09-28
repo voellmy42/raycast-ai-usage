@@ -12,6 +12,8 @@ import { readClaude } from "../providers/claude";
 import { geminiUnavailable } from "../providers/gemini";
 import type { CodexCache, Preferences, Usage } from "../lib/types";
 
+import { providerVisible } from "../lib/menu-personalization";
+
 const key = "codex-usage-v1";
 export async function readCache(): Promise<CodexCache | null> {
   try {
@@ -58,6 +60,7 @@ export function useUsage(initial?: Usage) {
       try {
         await Promise.all([
           (async () => {
+            if (!providerVisible("codex", preferences)) return;
             try {
               const result = await readCodex(
                 preferences.codexPath,
@@ -74,6 +77,7 @@ export function useUsage(initial?: Usage) {
             }
           })(),
           (async () =>
+            providerVisible("claude", preferences) &&
             update(
               await isolatedRead("claude", () =>
                 readClaude(preferences.claudeSnapshot),
@@ -97,7 +101,12 @@ export function useUsage(initial?: Usage) {
         if (alive.current) setLoading(false);
       }
     },
-    [preferences.codexPath, preferences.claudeSnapshot],
+    [
+      preferences.codexPath,
+      preferences.claudeSnapshot,
+      preferences.codexVisible,
+      preferences.claudeVisible,
+    ],
   );
   useEffect(() => {
     alive.current = true;
@@ -106,5 +115,11 @@ export function useUsage(initial?: Usage) {
       alive.current = false;
     };
   }, [refresh]);
-  return { usages, loading, refresh };
+  return {
+    usages: usages.filter((usage) =>
+      providerVisible(usage.provider, preferences),
+    ),
+    loading,
+    refresh,
+  };
 }

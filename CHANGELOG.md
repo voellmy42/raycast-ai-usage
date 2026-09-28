@@ -1,5 +1,11 @@
 # Changelog
 
+## Menu personalization - 2026-09-28
+
+- Pin a quota window or automatically follow a provider’s lowest remaining quota.
+- Choose compact or detailed menu text and hide unused providers.
+- Preserve unavailable, stale, and snapshot states in the menu title.
+
 ## [Initial Release] - {PR_MERGE_DATE}
 - Split dashboard with inline capacity details and a modern orbital icon.
 - Persistent menu-bar hide/show controls; hidden menu commands skip provider checks.

@@ -28,6 +28,10 @@ export interface Usage {
   error: { code: string; message: string; retryAt: string | null } | null;
 }
 export interface Preferences {
+  menuStyle?: "compact" | "detailed";
+  codexVisible?: boolean;
+  claudeVisible?: boolean;
+  geminiVisible?: boolean;
   codexPath?: string;
   claudeSnapshot?: string;
 }

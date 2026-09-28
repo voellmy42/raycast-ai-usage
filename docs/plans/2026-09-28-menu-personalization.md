@@ -27,3 +27,11 @@ Load saved selection before displaying quota. Derive percentage/countdown from t
 ### Task 4: Review and documentation
 Files: README.md; CHANGELOG.md.
 Document selection, formats, hidden-provider behavior and manual verification. Review React changes with react-best-practices skill. Run `npm test`, `npm run typecheck`, `npm run build`, `npm run lint`. Record limitations accurately; preserve unrelated progress.md changes.
+
+## Verification results
+
+- 31 tests passed, including five new selection/presentation tests.
+- TypeScript and Raycast build passed; local extension updated.
+- ESLint and Prettier passed. Full Raycast lint fails only on the existing author `voellmy` (HTTP 404).
+- Native screenshot confirms loaded quota dashboard and both new Actions entries. Preference changes, pin/relaunch behavior, and restart persistence still need manual interaction checks.
+- Unrelated progress.md edits preserved.
