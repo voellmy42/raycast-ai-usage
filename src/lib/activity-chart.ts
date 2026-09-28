@@ -55,7 +55,7 @@ export function activityChart(
               : (d.models[key] ?? 0);
           const h = (value / max) * 180;
           y -= h;
-          return `<rect x="${(64 + i * width).toFixed(2)}" y="${y.toFixed(2)}" width="${Math.max(1, width - 2).toFixed(2)}" height="${h.toFixed(2)}" fill="${colors[k % colors.length]}"/>`;
+          return `<rect x="${(64 + i * width).toFixed(2)}" y="${y.toFixed(2)}" width="${Math.max(1, width - 2).toFixed(2)}" height="${h.toFixed(2)}" fill="${key === "Other" ? colors[6] : colors[k % colors.length]}"/>`;
         })
         .join("");
     })
@@ -70,9 +70,34 @@ export function activityChart(
         `<text x="${64 + i * width + width / 2}" y="254" text-anchor="middle">${esc(summary.daily[i].day.slice(5))}</text>`,
     )
     .join("");
+  const legendItems = modelKeys.flatMap((key, i) => {
+    const model = summary.models.find((m) => m.key === key);
+    return model
+      ? [{ label: model.model, color: colors[i % colors.length] }]
+      : [];
+  });
+  if (summary.models.some((m) => !modelKeys.includes(m.key)))
+    legendItems.push({ label: "Other", color: colors[6] });
+  let legendX = 24,
+    legendY = 281;
+  const legend = legendItems
+    .map(({ label, color }) => {
+      // Fixed-width labels make wrapping predictable, including long model IDs.
+      const shown = label.length > 31 ? `${label.slice(0, 28)}…` : label;
+      const width = 26 + shown.length * 7.3;
+      if (legendX + width > 736) {
+        legendX = 24;
+        legendY += 24;
+      }
+      const item = `<rect x="${legendX}" y="${legendY - 10}" width="10" height="10" rx="2" fill="${color}"/><text x="${legendX + 16}" y="${legendY}" font-family="Menlo,monospace" font-size="12"><title>${esc(label)}</title>${esc(shown)}</text>`;
+      legendX += width;
+      return item;
+    })
+    .join("");
   return frame(
-    `<text x="24" y="28" font-size="15" font-weight="bold">Daily tokens · ${summary.daily.length} days</text>${grid}${bars}${labels}<text x="24" y="287">Blank days: no local records · Input includes cache reads/writes</text>`,
+    `<text x="24" y="28" font-size="15" font-weight="bold">Daily tokens · ${summary.daily.length} days</text>${grid}${bars}${labels}${legend}`,
     dark,
+    legendItems.length ? legendY + 20 : 274,
   );
 }
 export function quotaChart(
@@ -98,7 +123,7 @@ export function quotaChart(
     used + (f.rate * (limit - f.observedAt)) / 3600_000,
   );
   return frame(
-    `<text x="24" y="28" font-size="15" font-weight="bold">Quota consumed · recent pace projection</text><line x1="64" y1="60" x2="714" y2="60" stroke="#E8789B" stroke-dasharray="4 4"/><text x="20" y="64">100%</text><text x="30" y="224">0%</text><polyline fill="none" stroke="${colors[0]}" stroke-width="3" points="${path}"/><line x1="${x(f.observedAt)}" y1="${y(used)}" x2="${x(limit)}" y2="${y(projected)}" stroke="${colors[3]}" stroke-width="3" stroke-dasharray="6 5"/><line x1="714" y1="45" x2="714" y2="228" stroke="${colors[2]}"/><text x="710" y="250" text-anchor="end">Reset ${esc(new Date(end).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</text><text x="64" y="250">${esc(new Date(from).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</text><text x="24" y="286">Blue: observed · Dashed: estimate · Green: reset</text>`,
+    `<text x="24" y="28" font-size="15" font-weight="bold">Quota consumed · recent pace projection</text><line x1="64" y1="60" x2="714" y2="60" stroke="#E8789B" stroke-dasharray="4 4"/><text x="20" y="64">100%</text><text x="30" y="224">0%</text><polyline fill="none" stroke="${colors[0]}" stroke-width="3" points="${path}"/><line x1="${x(f.observedAt)}" y1="${y(used)}" x2="${x(limit)}" y2="${y(projected)}" stroke="${colors[3]}" stroke-width="3" stroke-dasharray="6 5"/><line x1="714" y1="45" x2="714" y2="228" stroke="${colors[2]}"/><text x="710" y="250" text-anchor="end">Reset ${esc(new Date(end).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</text><text x="64" y="250">${esc(new Date(from).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }))}</text><line x1="24" y1="281" x2="46" y2="281" stroke="${colors[0]}" stroke-width="3"/><text x="54" y="286">Observed</text><line x1="164" y1="281" x2="186" y2="281" stroke="${colors[3]}" stroke-width="3" stroke-dasharray="5 4"/><text x="194" y="286">Estimate</text><line x1="304" y1="281" x2="326" y2="281" stroke="${colors[2]}" stroke-width="3"/><text x="334" y="286">Reset</text>`,
     dark,
   );
 }

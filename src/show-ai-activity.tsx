@@ -1,6 +1,7 @@
 import {
   Action,
   ActionPanel,
+  Detail,
   Icon,
   Keyboard,
   List,
@@ -60,20 +61,11 @@ export default function ShowAIActivity() {
     (min, e) => Math.min(min, e.time),
     Infinity,
   );
-  const coverage = `Local records on this Mac${Number.isFinite(earliest) ? ` since ${new Date(earliest).toLocaleDateString()}` : ""}. May include multiple accounts and omit other devices or cloud activity. Blank days mean no local records.`;
+  const coverage = `This Mac${Number.isFinite(earliest) ? ` · Since ${new Date(earliest).toLocaleDateString()}` : ""}. May span accounts; other devices excluded. Gaps mean no records.`;
   const issues = [
     ...(activity.data?.notes ?? []),
     ...(activity.error ? [activity.error] : []),
   ];
-  const legend = keys
-    .flatMap((key, i) =>
-      summary.models.some((m) => m.key === key)
-        ? [
-            `- ${["Blue", "Purple", "Teal", "Amber", "Pink", "Sky blue"][i]}: ${markdownEscape(key)}`,
-          ]
-        : [],
-    )
-    .join("\n");
   const actions = (
     <ActionPanel>
       <Action
@@ -86,6 +78,17 @@ export default function ShowAIActivity() {
           void quota.refresh(true);
         }}
       />
+      {issues.length ? (
+        <Action.Push
+          title="Import Details"
+          icon={Icon.Info}
+          target={
+            <Detail
+              markdown={`## Import notes\n\n${issues.map((s) => `- ${markdownEscape(s)}`).join("\n")}\n\n${coverage}`}
+            />
+          }
+        />
+      ) : null}
       <Action
         title="Show AI Usage"
         icon={Icon.Gauge}
@@ -128,7 +131,7 @@ export default function ShowAIActivity() {
           actions={actions}
           detail={
             <List.Item.Detail
-              markdown={`# ${compact(summary.total)} tokens\n\nLast ${days} days · ${summary.models.length} models\n\n${chart}\n\n${summary.events ? `${legend}${summary.models.some((m) => !keys.includes(m.key)) ? "\n- Gray: other models" : ""}` : activity.loading ? "Importing local history…" : "No supported token records found in this period. Try a longer date range."}\n\n### Coverage\n\n${coverage}\n\n${activity.data ? `${activity.data.files} files checked · Updated ${new Date(activity.data.updatedAt).toLocaleTimeString()}` : ""}${issues.length ? `\n\n### Import notes\n\n${issues.map((s) => `- ${markdownEscape(s)}`).join("\n")}` : ""}`}
+              markdown={`# ${compact(summary.total)} tokens\n\nLast ${days} days · ${summary.models.length} models\n\n${chart}\n\n${summary.events ? "" : activity.loading ? "Importing…" : "No records. Try a longer period."}\n\n${coverage}\n\n${activity.data ? `Updated ${new Date(activity.data.updatedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}${issues.length ? `\n\n${issues.length} import notes · ⌘K for details.` : ""}`}
             />
           }
         />
@@ -177,7 +180,7 @@ export default function ShowAIActivity() {
               actions={actions}
               detail={
                 <List.Item.Detail
-                  markdown={`# ${markdownEscape(row.model)}\n\n${row.provider} · ${summary.total ? Math.round(((row.input + row.output) / summary.total) * 100) : 0}% of recorded tokens\n\n${chartMarkdown(activityChart(modelSummary, dark, keys), "Daily model token activity")}\n\n| Token category | Tokens |\n| --- | ---: |\n| Fresh input | ${(row.input - row.cached - row.cacheWrite).toLocaleString()} |\n| Cached input read | ${row.cached.toLocaleString()} |\n| Cache write | ${row.cacheWrite.toLocaleString()} |\n| Output (includes reasoning) | ${row.output.toLocaleString()} |\n| **Total** | **${(row.input + row.output).toLocaleString()}** |\n\n### Subscription quota\n\n${reported.length ? reported.map((w) => `${markdownEscape(w.label)}: ${w.usedPercent === null ? "Unknown" : `${w.usedPercent}% used`} (provider-reported; current account, separate from local activity).`).join("\n\n") : "No current matching model-specific quota reported. Shared account quota cannot be attributed to this model."}\n\nToken volume reflects your workload, not model efficiency. Quota consumption comparisons need attributable observations.\n\n${coverage}`}
+                  markdown={`# ${markdownEscape(row.model)}\n\n${row.provider} · ${summary.total ? Math.round(((row.input + row.output) / summary.total) * 100) : 0}% of recorded tokens\n\n${chartMarkdown(activityChart(modelSummary, dark, keys), "Daily model token activity")}\n\n| Token category | Tokens |\n| --- | ---: |\n| Fresh input | ${(row.input - row.cached - row.cacheWrite).toLocaleString()} |\n| Cached input read | ${row.cached.toLocaleString()} |\n| Cache write | ${row.cacheWrite.toLocaleString()} |\n| Output (includes reasoning) | ${row.output.toLocaleString()} |\n| **Total** | **${(row.input + row.output).toLocaleString()}** |\n\n### Subscription quota\n\n${reported.length ? reported.map((w) => `${markdownEscape(w.label)}: ${w.usedPercent === null ? "Unknown" : `${w.usedPercent}% used`} (provider-reported; current account, separate from local activity).`).join("\n\n") : "Shared quota · Model split unavailable."}\n\nToken totals do not measure quota efficiency.\n\n${coverage}`}
                 />
               }
             />
@@ -227,7 +230,7 @@ export default function ShowAIActivity() {
                             "Quota history and forecast",
                           )
                         : ""
-                    }\n\n${window.resetsAt ? `Reset: ${new Date(window.resetsAt).toLocaleString()}` : "Reset not reported"}\n\n${f ? `${f.samples} readings over ${Math.round((f.observedAt - f.from) / 60000)} minutes. ` : ""}Forecast uses observed quota consumption, not token totals. Changes in workload or model choice can change the result.\n\n${usage.provider === "claude" ? "Claude readings describe the snapshot source; current account identity cannot be verified. " : ""}Readings accumulate when quotas refresh. The enabled menu bar checks every five minutes; use manual refresh when it is hidden.\n\n${quota.historyError ?? ""}`}
+                    }\n\n${window.resetsAt ? `Reset: ${new Date(window.resetsAt).toLocaleString()}` : "Reset not reported"}\n\n${f ? `${f.samples} readings over ${Math.round((f.observedAt - f.from) / 60000)} minutes. ` : ""}Estimate assumes your recent quota use continues.\n\n${usage.provider === "claude" ? "Claude snapshot · Account unverified. " : ""}Readings update with the menu bar, or on manual refresh.\n\n${quota.historyError ?? ""}`}
                   />
                 }
               />
