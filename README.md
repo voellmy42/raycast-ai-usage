@@ -4,6 +4,31 @@ Keep your Codex subscription capacity in view, with quota reset times, an option
 
 **Codex is supported today. Claude and more providers are coming next as AI Usage grows, guided by demand.** This release does not connect to other providers or report API spending.
 
+## Install from GitHub
+
+This extension is distributed through this public GitHub repository. You do not need a Raycast Store account or Store submission to install it locally.
+
+Install Raycast, Node.js 22.14+ with npm, and Git, then run:
+
+```sh
+git clone https://github.com/voellmy42/raycast-ai-usage.git
+cd raycast-ai-usage
+npm ci
+npm run build
+```
+
+The build installs the extension into Raycast's local extensions directory. Open Raycast and search **Show AI Usage**. For quotas, you also need a working Codex installation signed in with your ChatGPT account.
+
+To update, run these commands from the same checkout:
+
+```sh
+git pull --ff-only origin main
+npm ci
+npm run build
+```
+
+Reopen the commands after rebuilding. GitHub installations are managed locally and do not receive Raycast Store automatic updates.
+
 ## Get started
 
 1. Install and sign in to Codex CLI, the Codex app, or a ChatGPT app installation that includes Codex. Use your ChatGPT subscription login; API-key authentication does not expose subscription quotas.
@@ -12,7 +37,7 @@ Keep your Codex subscription capacity in view, with quota reset times, an option
 
 If the executable is not detected, set **Codex Executable** to its absolute path in extension preferences. A working Codex executable bundled with ChatGPT can also be used instead of a broken global npm launcher.
 
-Requirements: macOS, Raycast, and a working signed-in Codex installation. Store submission is pending; to try the extension from source, follow the development instructions below.
+Requirements: macOS, Raycast, and a working signed-in Codex installation. This release is distributed from GitHub; it is not listed in the Raycast Store.
 
 ## Daily use
 

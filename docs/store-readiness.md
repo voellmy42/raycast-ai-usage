@@ -1,6 +1,6 @@
 # Raycast Store readiness
 
-The first release is Codex-only. Claude and other providers appear only in a small coming-soon note. No submission has been made.
+The first release is Codex-only. Claude and other providers appear only in a small coming-soon note. Distribution uses the public GitHub repository and a local source build. No Store submission is planned for this release; the checklist below is retained for a possible future Store release.
 
 ## Remaining submission gates
 

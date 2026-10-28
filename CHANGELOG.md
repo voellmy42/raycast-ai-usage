@@ -1,6 +1,6 @@
 # Changelog
 
-## [Initial Release] - {PR_MERGE_DATE}
+## [Initial Release] - 2026-10-28
 
 - View Codex subscription quotas, remaining capacity, and provider-reported reset times.
 - Pin a quota to the menu bar or follow the lowest remaining Codex quota, with compact and detailed displays.
