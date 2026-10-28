@@ -29,11 +29,7 @@ export interface Usage {
 }
 export interface Preferences {
   menuStyle?: "compact" | "detailed";
-  codexVisible?: boolean;
-  claudeVisible?: boolean;
-  geminiVisible?: boolean;
   codexPath?: string;
-  claudeSnapshot?: string;
 }
 export interface CodexCache {
   fingerprint: string;

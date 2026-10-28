@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "ai-usage",
   "title": "AI Usage",
-  "description": "View Codex subscription usage and Claude Code quota snapshots in Raycast.",
+  "description": "Track Codex subscription quotas, reset times, and local token activity in Raycast.",
   "icon": "icon-v2.png",
   "author": "voellmy",
   "platforms": [
@@ -17,19 +17,19 @@
     {
       "name": "show-ai-usage",
       "title": "Show AI Usage",
-      "description": "Check connected AI account quotas and reset times",
+      "description": "Check Codex subscription quotas and reset times",
       "mode": "view"
     },
     {
       "name": "show-ai-activity",
       "title": "Show AI Activity",
-      "description": "Explore local token history, model activity, and quota forecasts",
+      "description": "Explore local Codex token history, model activity, and quota forecasts",
       "mode": "view"
     },
     {
       "name": "ai-usage-menu-bar",
       "title": "AI Usage Menu Bar",
-      "description": "Keep AI account quotas in the menu bar",
+      "description": "Keep Codex subscription capacity in the menu bar",
       "mode": "menu-bar",
       "interval": "5m"
     }
@@ -40,13 +40,6 @@
       "title": "Codex Executable",
       "description": "Optional absolute path to a working Codex executable. ChatGPT and Codex app installations are detected automatically.",
       "type": "textfield",
-      "required": false
-    },
-    {
-      "name": "claudeSnapshot",
-      "title": "Claude Usage Snapshot",
-      "description": "Optional path to a snapshot captured by the included Claude Code status-line helper. See README for setup and required version.",
-      "type": "file",
       "required": false
     },
     {
@@ -66,33 +59,6 @@
           "value": "detailed"
         }
       ]
-    },
-    {
-      "name": "codexVisible",
-      "title": "Codex",
-      "label": "Show Codex",
-      "description": "Include Codex in the dashboard and menu.",
-      "type": "checkbox",
-      "required": false,
-      "default": true
-    },
-    {
-      "name": "claudeVisible",
-      "title": "Claude",
-      "label": "Show Claude",
-      "description": "Include Claude in the dashboard and menu.",
-      "type": "checkbox",
-      "required": false,
-      "default": true
-    },
-    {
-      "name": "geminiVisible",
-      "title": "Gemini",
-      "label": "Show Gemini",
-      "description": "Include Gemini in the dashboard and menu.",
-      "type": "checkbox",
-      "required": false,
-      "default": true
     }
   ],
   "scripts": {
@@ -104,7 +70,7 @@
     "publish": "npx @raycast/api@latest publish"
   },
   "dependencies": {
-    "@raycast/api": "2.5.2",
+    "@raycast/api": "2.10.1",
     "react": "^19.0.0"
   },
   "devDependencies": {

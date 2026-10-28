@@ -31,6 +31,63 @@ const message = (id: string, output = 10) =>
       },
     },
   });
+test("Codex-only import removes retired providers from an existing activity cache", async () => {
+  const root = await mkdtemp(join(tmpdir(), "activity-migration-"));
+  try {
+    const claude = join(root, "claude"),
+      codex = join(root, "codex"),
+      cache = join(root, "cache");
+    await mkdir(claude);
+    await mkdir(codex);
+    await writeFile(join(claude, "session.jsonl"), message("old") + "\n");
+    await writeFile(
+      join(codex, "session.jsonl"),
+      [
+        { type: "turn_context", payload: { model: "codex-test" } },
+        {
+          type: "event_msg",
+          timestamp: new Date(now).toISOString(),
+          payload: {
+            type: "token_count",
+            info: {
+              total_token_usage: {
+                input_tokens: 10,
+                output_tokens: 5,
+                cached_input_tokens: 0,
+              },
+              last_token_usage: {
+                input_tokens: 10,
+                output_tokens: 5,
+                cached_input_tokens: 0,
+              },
+            },
+          },
+        },
+      ]
+        .map((record) => JSON.stringify(record))
+        .join("\n") + "\n",
+    );
+    const roots = [
+      { provider: "codex" as const, path: codex },
+      { provider: "claude" as const, path: claude },
+    ];
+    const mixed = await importActivity(roots, cache, now);
+    assert.ok(mixed.events.some((e) => e.provider === "claude"));
+    assert.ok(mixed.events.some((e) => e.provider === "codex"));
+    const migrated = await importActivity(roots.slice(0, 1), cache, now);
+    assert.deepEqual(
+      migrated.events,
+      mixed.events.filter((e) => e.provider === "codex"),
+    );
+    assert.ok(
+      !(await readFile(join(cache, "activity-v1.json"), "utf8")).includes(
+        '"provider":"claude"',
+      ),
+    );
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 test("incremental import, streaming duplicates, appends, partial records, truncation and symlinks", async () => {
   const root = await mkdtemp(join(tmpdir(), "activity-test-"));
   try {

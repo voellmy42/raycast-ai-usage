@@ -3,7 +3,8 @@ import {
   ActionPanel,
   Icon,
   List,
-  openExtensionPreferences,
+  launchCommand,
+  LaunchType,
 } from "@raycast/api";
 import { useEffect, useState } from "react";
 import { useUsage } from "./hooks/use-usage";
@@ -19,7 +20,7 @@ import {
 } from "./lib/format";
 
 export default function ShowAIUsage() {
-  const { usages, loading, refresh, history } = useUsage();
+  const { usages, loading, refresh, history, historyError } = useUsage();
   const visibility = useMenuVisibility();
   const [, tick] = useState(0);
   useEffect(() => {
@@ -30,29 +31,13 @@ export default function ShowAIUsage() {
     <List
       isLoading={loading}
       isShowingDetail
-      searchBarPlaceholder="Search providers and quota windows…"
+      searchBarPlaceholder="Search Codex quota windows…"
     >
-      {!usages.length ? (
-        <List.EmptyView
-          title="All Providers Hidden"
-          description="Enable a provider in extension preferences."
-          actions={
-            <ActionPanel>
-              <Action
-                title="Open Extension Preferences"
-                onAction={openExtensionPreferences}
-              />
-            </ActionPanel>
-          }
-        />
-      ) : null}
       {usages.map((usage) => (
         <List.Section
           key={usage.provider}
           title={`${usage.account.label}${usage.account.plan ? ` · ${usage.account.plan}` : ""}`}
-          subtitle={
-            usage.provider === "claude" ? "Snapshot" : observationText(usage)
-          }
+          subtitle={observationText(usage)}
         >
           {usage.quotaWindows.length ? (
             usage.quotaWindows.map((window) => {
@@ -88,6 +73,7 @@ export default function ShowAIUsage() {
                       usage={usage}
                       window={window}
                       observations={history[usage.provider] ?? []}
+                      historyError={historyError}
                     />
                   }
                   actions={
@@ -114,7 +100,7 @@ export default function ShowAIUsage() {
                   ? Icon.ExclamationMark
                   : Icon.Plug
               }
-              detail={<QuotaDetail usage={usage} />}
+              detail={<QuotaDetail usage={usage} historyError={historyError} />}
               actions={
                 <UsageActions
                   usage={usage}
@@ -126,6 +112,34 @@ export default function ShowAIUsage() {
           )}
         </List.Section>
       ))}
+      <List.Section title="Coming Soon">
+        <List.Item
+          id="upcoming-providers"
+          title="Claude and More"
+          icon={Icon.Clock}
+          detail={
+            <List.Item.Detail
+              markdown={
+                "## More Providers Coming Soon\n\nCodex is available today. Claude and other AI providers are next on our wishlist as AI Usage grows.\n\nFuture integrations will be guided by demand. No extra setup is needed for this release."
+              }
+            />
+          }
+          actions={
+            <ActionPanel>
+              <Action
+                title="Show Activity Graphs"
+                icon={Icon.BarChart}
+                onAction={() =>
+                  launchCommand({
+                    name: "show-ai-activity",
+                    type: LaunchType.UserInitiated,
+                  })
+                }
+              />
+            </ActionPanel>
+          }
+        />
+      </List.Section>
     </List>
   );
 }

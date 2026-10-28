@@ -6,18 +6,13 @@ import {
   showToast,
   Toast,
 } from "@raycast/api";
+import { join } from "node:path";
 import { baseUsage, validateCachedUsage } from "../lib/normalize";
-import { failure, isolatedRead } from "../lib/refresh";
-import { readCodex } from "../providers/codex";
-import { readClaude } from "../providers/claude";
-import { geminiUnavailable } from "../providers/gemini";
+import { failure, refreshFeedback } from "../lib/refresh";
+import { readCodex, type CodexResult } from "../providers/codex";
 import type { CodexCache, Preferences, Usage } from "../lib/types";
-
 import { recordQuota } from "../lib/quota-history";
 import type { QuotaObservation } from "../lib/forecast";
-import { join } from "node:path";
-
-import { providerVisible } from "../lib/menu-personalization";
 
 const key = "codex-usage-v1";
 export async function readCache(): Promise<CodexCache | null> {
@@ -39,13 +34,9 @@ export async function readCache(): Promise<CodexCache | null> {
   }
 }
 
-export function useUsage(initial?: Usage) {
-  const preferences = getPreferenceValues<Preferences>();
-  const [usages, setUsages] = useState<Usage[]>(() =>
-    [baseUsage("codex"), baseUsage("claude"), geminiUnavailable()].map(
-      (usage) => (usage.provider === initial?.provider ? initial : usage),
-    ),
-  );
+export function useUsage() {
+  const { codexPath } = getPreferenceValues<Preferences>();
+  const [usage, setUsage] = useState<Usage>(() => baseUsage("codex"));
   const [history, setHistory] = useState<Record<string, QuotaObservation[]>>(
     {},
   );
@@ -57,101 +48,65 @@ export function useUsage(initial?: Usage) {
     async (force = false) => {
       if (active.current) return;
       active.current = true;
-      setLoading(true);
       if (alive.current) {
+        setLoading(true);
         setHistory({});
         setHistoryError(null);
       }
-      const capture = async (identity: string, usage: Usage) => {
+      try {
+        let result: CodexResult;
         try {
-          const points = await recordQuota(
-            join(environment.supportPath, "analytics"),
-            identity,
-            usage,
-          );
-          if (
-            alive.current &&
-            usage.connectionStatus === "ready" &&
-            usage.freshness === "fresh"
-          )
-            setHistory((previous) => ({
-              ...previous,
-              [usage.provider]: points,
-            }));
+          result = await readCodex(codexPath, await readCache(), force);
+        } catch (error) {
+          result = { usage: failure("codex", error), cache: null };
+        }
+        if (alive.current) setUsage(result.usage);
+        let cacheError = false;
+        try {
+          if (result.cache)
+            await LocalStorage.setItem(key, JSON.stringify(result.cache));
+          else await LocalStorage.removeItem(key);
         } catch {
+          cacheError = true;
           if (alive.current)
             setHistoryError(
-              "Quota history could not be saved. Forecasts may be unavailable.",
+              "The local usage cache could not be updated. Try refreshing again.",
             );
         }
-      };
-      const update = (usage: Usage) => {
-        if (alive.current)
-          setUsages((previous) =>
-            previous.map((item) =>
-              item.provider === usage.provider ? usage : item,
-            ),
-          );
-      };
-      try {
-        await Promise.all([
-          (async () => {
-            if (!providerVisible("codex", preferences)) return;
-            try {
-              const result = await readCodex(
-                preferences.codexPath,
-                await readCache(),
-                force,
+        if (result.cache) {
+          try {
+            const points = await recordQuota(
+              join(environment.supportPath, "analytics"),
+              `codex:${result.cache.fingerprint}`,
+              result.usage,
+            );
+            if (
+              alive.current &&
+              result.usage.connectionStatus === "ready" &&
+              result.usage.freshness === "fresh"
+            )
+              setHistory({ codex: points });
+          } catch {
+            if (alive.current)
+              setHistoryError(
+                "Quota history could not be saved. Forecasts may be unavailable.",
               );
-              update(result.usage);
-              if (result.cache)
-                await capture(
-                  `codex:${result.cache.fingerprint}`,
-                  result.usage,
-                );
-              if (result.cache)
-                await LocalStorage.setItem(key, JSON.stringify(result.cache));
-              else await LocalStorage.removeItem(key);
-            } catch (error) {
-              update(failure("codex", error));
-              await LocalStorage.removeItem(key);
-            }
-          })(),
-          (async () => {
-            if (!providerVisible("claude", preferences)) return;
-            const usage = await isolatedRead("claude", () =>
-              readClaude(preferences.claudeSnapshot),
-            );
-            update(usage);
-            await capture(
-              `claude-snapshot:${preferences.claudeSnapshot || "default"}`,
-              usage,
-            );
-          })(),
-        ]);
-        if (force && alive.current)
+          }
+        }
+        if (force && alive.current) {
+          const feedback = refreshFeedback(result.usage, cacheError);
           await showToast({
-            style: Toast.Style.Success,
-            title: "Usage Sources Checked",
-            message: "Claude snapshots update during Claude Code activity.",
+            style: feedback.success ? Toast.Style.Success : Toast.Style.Failure,
+            title: feedback.title,
+            message: feedback.message,
           });
-      } catch {
-        if (alive.current)
-          await showToast({
-            style: Toast.Style.Failure,
-            title: "Could Not Save Usage Cache",
-          });
+        }
       } finally {
         active.current = false;
         if (alive.current) setLoading(false);
       }
     },
-    [
-      preferences.codexPath,
-      preferences.claudeSnapshot,
-      preferences.codexVisible,
-      preferences.claudeVisible,
-    ],
+    [codexPath],
   );
   useEffect(() => {
     alive.current = true;
@@ -160,13 +115,5 @@ export function useUsage(initial?: Usage) {
       alive.current = false;
     };
   }, [refresh]);
-  return {
-    usages: usages.filter((usage) =>
-      providerVisible(usage.provider, preferences),
-    ),
-    loading,
-    refresh,
-    history,
-    historyError,
-  };
+  return { usages: [usage], loading, refresh, history, historyError };
 }

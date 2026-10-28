@@ -84,5 +84,6 @@ export function connectionLabel(usage: Usage) {
     return usage.provider === "gemini"
       ? "Coming Later"
       : "Account Not Supported";
+  if (usage.connectionStatus === "ready") return "No Quota Reported";
   return "Set Up Connection";
 }

@@ -6,6 +6,8 @@ import {
   open,
   openExtensionPreferences,
   type LaunchProps,
+  launchCommand,
+  LaunchType,
 } from "@raycast/api";
 import { useUsage } from "./hooks/use-usage";
 import { useMenuVisibility } from "./hooks/use-menu-visibility";
@@ -15,7 +17,7 @@ import {
   resetText,
   shortQuotaLabel,
 } from "./lib/format";
-import { usagePages } from "./components/usage-details";
+import { codexUsagePage } from "./components/usage-details";
 
 import { useEffect, useState } from "react";
 import {
@@ -85,7 +87,7 @@ function VisibleMenu({ hide }: { hide: () => Promise<void> }) {
       {usages.map((usage) => (
         <MenuBarExtra.Section
           key={usage.provider}
-          title={`${usage.account.label}${usage.source === "claude_statusline_snapshot" ? " · Snapshot" : ""}${usage.freshness === "stale" ? " · Stale" : ""}`}
+          title={`${usage.account.label}${usage.freshness === "stale" ? " · Stale" : ""}`}
         >
           {usage.quotaWindows.length ? (
             usage.quotaWindows.map((window) => (
@@ -93,7 +95,7 @@ function VisibleMenu({ hide }: { hide: () => Promise<void> }) {
                 key={window.id}
                 title={`${shortQuotaLabel(window)}: ${quotaSummary(window)}`}
                 subtitle={resetText(window)}
-                onAction={() => open(usagePages[usage.provider])}
+                onAction={() => open(codexUsagePage)}
               />
             ))
           ) : (
@@ -105,6 +107,26 @@ function VisibleMenu({ hide }: { hide: () => Promise<void> }) {
         </MenuBarExtra.Section>
       ))}
       <MenuBarExtra.Section>
+        <MenuBarExtra.Item
+          title="Open Usage Dashboard"
+          icon={Icon.Gauge}
+          onAction={() =>
+            launchCommand({
+              name: "show-ai-usage",
+              type: LaunchType.UserInitiated,
+            })
+          }
+        />
+        <MenuBarExtra.Item
+          title="Open Activity"
+          icon={Icon.BarChart}
+          onAction={() =>
+            launchCommand({
+              name: "show-ai-activity",
+              type: LaunchType.UserInitiated,
+            })
+          }
+        />
         <MenuBarExtra.Item
           title="Refresh Usage"
           icon={Icon.ArrowClockwise}

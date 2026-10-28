@@ -1,4 +1,4 @@
-import type { Preferences, Provider, Usage } from "./types";
+import type { Provider, Usage } from "./types";
 import { isExpired, quotaPresentation, resetText } from "./format";
 export const selectionKey = "menu-selection-v1";
 export interface MenuSelection {
@@ -10,7 +10,7 @@ export function parseSelection(raw?: string): MenuSelection {
     const value = JSON.parse(raw ?? "null");
     if (
       value &&
-      ["codex", "claude", "gemini"].includes(value.provider) &&
+      value.provider === "codex" &&
       (value.windowId === null ||
         (typeof value.windowId === "string" && value.windowId.length > 0))
     )
@@ -19,9 +19,6 @@ export function parseSelection(raw?: string): MenuSelection {
     /* Invalid storage restores the default. */
   }
   return { provider: "codex", windowId: null };
-}
-export function providerVisible(provider: Provider, preferences: Preferences) {
-  return preferences[`${provider}Visible`] !== false;
 }
 export function menuPresentation(
   usages: Usage[],

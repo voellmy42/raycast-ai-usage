@@ -6,23 +6,16 @@ import {
   Toast,
   Icon,
   Keyboard,
-  environment,
-  getPreferenceValues,
   openExtensionPreferences,
   launchCommand,
   LaunchType,
 } from "@raycast/api";
-import type { Usage, Preferences, QuotaWindow } from "../lib/types";
-import { claudeCaptureCommand } from "../lib/claude-setup";
+import type { Usage, QuotaWindow } from "../lib/types";
 import type { MenuVisibilityControl } from "../hooks/use-menu-visibility";
 
 import { selectionKey } from "../lib/menu-personalization";
 
-export const usagePages = {
-  codex: "https://chatgpt.com/codex/settings/usage",
-  claude: "https://claude.ai/settings/usage",
-  gemini: "https://geminicli.com/docs/resources/quota-and-pricing/",
-};
+export const codexUsagePage = "https://chatgpt.com/codex/settings/usage";
 export function UsageActions({
   usage,
   refresh,
@@ -52,6 +45,12 @@ export function UsageActions({
   return (
     <ActionPanel>
       <Action
+        title="Refresh Usage"
+        icon={Icon.ArrowClockwise}
+        onAction={refresh}
+        shortcut={Keyboard.Shortcut.Common.Refresh}
+      />
+      <Action
         title={visibility.visible ? "Hide Menu Bar" : "Show Menu Bar"}
         icon={visibility.visible ? Icon.EyeDisabled : Icon.Eye}
         shortcut={{ modifiers: ["cmd", "shift"], key: "m" }}
@@ -66,7 +65,7 @@ export function UsageActions({
           />
         ) : null}
         <Action
-          title="Use Provider’s Lowest Remaining Quota"
+          title="Use Lowest Remaining Codex Quota"
           icon={Icon.Gauge}
           onAction={() => select(null)}
         />
@@ -82,25 +81,10 @@ export function UsageActions({
             })
           }
         />
-        <Action
-          title="Refresh Usage"
-          icon={Icon.ArrowClockwise}
-          onAction={refresh}
-          shortcut={Keyboard.Shortcut.Common.Refresh}
-        />
         <Action.OpenInBrowser
           title="Open Provider Usage"
-          url={usagePages[usage.provider]}
+          url={codexUsagePage}
         />
-        {usage.provider === "claude" ? (
-          <Action.CopyToClipboard
-            title="Copy Claude Capture Command"
-            content={claudeCaptureCommand(
-              environment.assetsPath,
-              getPreferenceValues<Preferences>().claudeSnapshot,
-            )}
-          />
-        ) : null}
         <Action
           title="Open Extension Preferences"
           icon={Icon.Gear}

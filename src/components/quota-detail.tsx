@@ -26,13 +26,14 @@ export function QuotaDetail({
   usage,
   window,
   observations,
+  historyError,
 }: {
   usage: Usage;
   window?: QuotaWindow;
   observations?: QuotaObservation[];
+  historyError?: string | null;
 }) {
   const heading = `## ${markdownEscape(usage.account.label)}${usage.account.plan ? ` · ${markdownEscape(usage.account.plan)}` : ""}`;
-  const snapshot = usage.source === "claude_statusline_snapshot";
   const old =
     usage.freshness === "stale" ||
     usage.connectionStatus === "error" ||
@@ -46,18 +47,16 @@ export function QuotaDetail({
       ? ""
       : `\n\n${"▰".repeat(filled)}${"▱".repeat(10 - filled)}`;
   const setup =
-    usage.provider === "claude"
-      ? "Connect Claude Code's quota snapshot to see its last reported subscription usage.\n\nChoose **Copy Claude Capture Command** from Actions, then follow the extension's README. Requires quota fields from a compatible Claude Code version."
-      : usage.provider === "gemini"
-        ? "Gemini account quota is not connected yet. This provider needs a verified account reporting interface before usage can appear here."
-        : "Sign in to Codex with your ChatGPT account, then refresh. If Codex cannot be found, select its executable in extension preferences.";
+    usage.connectionStatus === "ready"
+      ? "Codex has not reported subscription quota windows. Open your provider usage page to check your plan, then refresh."
+      : "Sign in to Codex with your ChatGPT account, then refresh. If Codex cannot be found, install Codex CLI or select a working executable in extension preferences. API-key authentication does not provide subscription quotas.";
   const body =
     window && capacity
       ? `### ${markdownEscape(shortQuotaLabel(window))}\n\n# ${capacity.remaining === null ? "—" : percent(capacity.remaining)}\n\n${capacity.state === "stale" ? "remaining at last observation" : capacity.remaining === null ? capacity.label : "remaining"}${meter}\n\n**${capacity.label}**\n\n${resetText(window)}\n\n${observationText(usage)}${observations ? `\n\n### Forecast\n\n${forecastText(forecast(window, old ? [] : observations))}` : ""}`
       : `### ${connectionLabel(usage)}\n\n${setup}`;
   return (
     <List.Item.Detail
-      markdown={`${heading}\n\n${body}${usage.error ? `\n\n---\n\n${markdownEscape(usage.error.message)}` : ""}\n\n${snapshot ? "Snapshot updates during Claude Code activity. Refresh reads the saved snapshot." : usage.source === "codex_app_server" ? "Quota reported by your signed-in Codex account." : ""}`}
+      markdown={`${heading}\n\n${body}${usage.error ? `\n\n---\n\n${markdownEscape(usage.error.message)}` : ""}\n\n${historyError ? `${markdownEscape(historyError)}\n\n` : ""}${usage.source === "codex_app_server" ? "Quota reported by your signed-in Codex account." : ""}`}
       metadata={
         <List.Item.Detail.Metadata>
           {window && capacity ? (
@@ -93,11 +92,9 @@ export function QuotaDetail({
           <List.Item.Detail.Metadata.Label
             title="Source"
             text={
-              snapshot
-                ? "Claude Code snapshot"
-                : usage.source === "codex_app_server"
-                  ? "Codex account"
-                  : "Not connected"
+              usage.source === "codex_app_server"
+                ? "Codex account"
+                : "Not connected"
             }
           />
         </List.Item.Detail.Metadata>

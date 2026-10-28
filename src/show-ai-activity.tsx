@@ -61,7 +61,7 @@ export default function ShowAIActivity() {
     (min, e) => Math.min(min, e.time),
     Infinity,
   );
-  const coverage = `This Mac${Number.isFinite(earliest) ? ` · Since ${new Date(earliest).toLocaleDateString()}` : ""}. May span accounts; other devices excluded. Gaps mean no records.`;
+  const coverage = `Codex on this Mac${Number.isFinite(earliest) ? ` · Since ${new Date(earliest).toLocaleDateString()}` : ""}. May span accounts; other devices excluded. Gaps mean no records.`;
   const issues = [
     ...(activity.data?.notes ?? []),
     ...(activity.error ? [activity.error] : []),
@@ -230,7 +230,7 @@ export default function ShowAIActivity() {
                             "Quota history and forecast",
                           )
                         : ""
-                    }\n\n${window.resetsAt ? `Reset: ${new Date(window.resetsAt).toLocaleString()}` : "Reset not reported"}\n\n${f ? `${f.samples} readings over ${Math.round((f.observedAt - f.from) / 60000)} minutes. ` : ""}Estimate assumes your recent quota use continues.\n\n${usage.provider === "claude" ? "Claude snapshot · Account unverified. " : ""}Readings update with the menu bar, or on manual refresh.\n\n${quota.historyError ?? ""}`}
+                    }\n\n${window.resetsAt ? `Reset: ${new Date(window.resetsAt).toLocaleString()}` : "Reset not reported"}\n\n${f ? `${f.samples} readings over ${Math.round((f.observedAt - f.from) / 60000)} minutes. ` : ""}Estimate assumes your recent quota use continues.\n\nReadings update with the menu bar, or on manual refresh.\n\n${quota.historyError ?? ""}`}
                   />
                 }
               />
@@ -243,7 +243,11 @@ export default function ShowAIActivity() {
             icon={Icon.Info}
             actions={actions}
             detail={
-              <List.Item.Detail markdown="## Connect a quota source\n\nForecasts need current quota readings. Open Show AI Usage to connect a supported provider. Historical token activity is available independently." />
+              <List.Item.Detail
+                markdown={
+                  "## Connect Codex\n\nForecasts need current quota readings. Open Show AI Usage to check your Codex connection. Historical token activity is available independently."
+                }
+              />
             }
           />
         ) : null}

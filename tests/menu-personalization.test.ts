@@ -36,10 +36,21 @@ test("selection validates saved data", () => {
     provider: "codex",
     windowId: null,
   });
-  assert.deepEqual(parseSelection('{"provider":"claude","windowId":"week"}'), {
-    provider: "claude",
+  assert.deepEqual(parseSelection('{"provider":"codex","windowId":"week"}'), {
+    provider: "codex",
     windowId: "week",
   });
+});
+test("retired provider selections migrate to automatic Codex selection", () => {
+  for (const provider of ["claude", "gemini"]) {
+    assert.deepEqual(
+      parseSelection(JSON.stringify({ provider, windowId: "week" })),
+      {
+        provider: "codex",
+        windowId: null,
+      },
+    );
+  }
 });
 test("automatic selects lowest and uses its own reset", () => {
   assert.equal(
